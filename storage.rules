@@ -1,0 +1,21 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Profil fotoğrafları: Giriş yapmış herkes kendi UID'sine uygun dosyayı yükleyebilir
+    match /avatars/{userId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Soru resimleri: Giriş yapmış her kullanıcı soru resmi yükleyebilir
+    match /question_images/{imageId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // Genel kural (Diğer her şey için giriş şartı)
+    match /{allPaths=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
